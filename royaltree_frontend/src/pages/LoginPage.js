@@ -7,7 +7,8 @@ import { motion } from "framer-motion";
 // PUBLIC_INTERFACE
 export default function LoginPage() {
   const { setUser } = useContext(UserContext);
-  const [username, setUsername] = useState("");
+  const [identifier, setIdentifier] = useState(""); // email or username
+  const [role, setRole] = useState(""); // optional
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -16,12 +17,27 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     try {
-      // Send credentials as direct JSON (not wrapped, no stringification, matches FastAPI backend).
-      const payload = { username, password };
+      // Accept email OR username for identifier
+      let payload = identifier.includes("@")
+        ? { email: identifier, password }
+        : { username: identifier, password };
+      // Optionally send role if supplied
+      if (role) payload.role = role;
       const result = await apiPost("/auth/login", payload, null, false);
       if (result && result.access_token) {
-        setUser({ token: result.access_token });
-        navigate("/");
+        setUser({
+          token: result.access_token,
+          username: result.username,
+          role: result.role,
+          email: result.email,
+        });
+        // Redirect to dashboard/landing based on role
+        if (result.role === "creator")
+          navigate("/creator/dashboard");
+        else if (result.role === "investor")
+          navigate("/investor/dashboard");
+        else
+          navigate("/");
       } else {
         setError("Invalid response");
       }
@@ -70,18 +86,35 @@ export default function LoginPage() {
             </motion.div>
           )}
           <div className="flex flex-col gap-2">
-            <label htmlFor="login-username" className="font-heading text-sm font-semibold text-gold/90">
-              Username
+            <label htmlFor="login-identifier" className="font-heading text-sm font-semibold text-gold/90">
+              Email or Username
             </label>
             <input
-              id="login-username"
+              id="login-identifier"
               type="text"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
+              value={identifier}
+              onChange={e => setIdentifier(e.target.value)}
               autoFocus
               required
               className="transition border border-gold/30 rounded-lg px-4 py-2 bg-background/70 text-white focus:outline-none focus:border-neon-mint/80 font-body"
+              placeholder="Enter email or username"
             />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="login-role" className="font-heading text-sm font-semibold text-gold/90">
+              Role <span className="text-xs text-gold/60">(optional)</span>
+            </label>
+            <select
+              id="login-role"
+              value={role}
+              onChange={e => setRole(e.target.value)}
+              className="transition border border-gold/30 rounded-lg px-4 py-2 bg-background/60 text-white"
+            >
+              <option value="">(Any)</option>
+              <option value="creator">Creator</option>
+              <option value="investor">Investor</option>
+              <option value="admin">Admin</option>
+            </select>
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="login-password" className="font-heading text-sm font-semibold text-gold/90">
