@@ -20,9 +20,17 @@ This project provides a minimal React template with a clean, modern UI and minim
 > ```
 > REACT_APP_BACKEND_BASE_URL=http://localhost:3001
 > ```
-> Adjust the host as needed for deployment. This makes frontend API calls target your backend.
+> Adjust the host, protocol (http or https!), and port if running in a non-localhost environment.
 >
-> If you see CORS errors, ensure your backend's CORS settings allow requests from your frontend origin (e.g., http://localhost:3000).
+> **Troubleshooting "Failed to fetch":**
+>
+> 1. The API URL (including protocol, host, AND port) MUST match your backend server location and be reachable from your browser. If running locally, both frontend and backend must use compatible hosts (localhost or 127.0.0.1).
+> 2. If deployed (cloud/devbox), use the *external* or proxy URL provided by your platform. Do **not** use "localhost" in `.env` for cloud previews!
+> 3. You may override by setting `window._API_BASE_URL` in `public/index.html` (insert `<script>window._API_BASE_URL = "..."</script>`).
+> 4. Check backend is running and listening on the expected URL and port.
+> 5. If you see CORS errors, ensure your backend's CORS settings allow requests from your frontend origin (e.g., http://localhost:3000).
+>
+> This config makes frontend API calls target your backend.
 
 In the project directory, you can run:
 

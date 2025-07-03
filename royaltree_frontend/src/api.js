@@ -2,12 +2,12 @@
 // Royaltree frontend API helpers for REST endpoints
 //
 // Allow API base URL to be set via environment variable or default to local dev server, for deployment flexibility
-const API_BASE = (
+const API_BASE =
+  // Window-global FIRST if defined from index.html (for Netlify, Vercel, etc.)
+  (typeof window !== "undefined" && window._API_BASE_URL) ||
   process.env.REACT_APP_BACKEND_BASE_URL ||
   process.env.BACKEND_BASE_URL ||
-  (window && window._API_BASE_URL) ||
-  "http://localhost:3001"
-);
+  "http://localhost:3001";
 
 // PUBLIC_INTERFACE
 export async function apiGet(path, params = {}, token = null) {
