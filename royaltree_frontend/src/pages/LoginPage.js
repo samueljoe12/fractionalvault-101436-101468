@@ -5,44 +5,69 @@ import { UserContext } from "../App";
 import { motion } from "framer-motion";
 
 // PUBLIC_INTERFACE
+/**
+ * Login page for Royaltree: users login with email and role.
+ * Provides modern UI, frontend validation, direct backend connection, session update & robust error/success feedback.
+ */
 export default function LoginPage() {
   const { setUser } = useContext(UserContext);
-  const [identifier, setIdentifier] = useState(""); // email or username
-  const [role, setRole] = useState(""); // optional
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState(""); // User must select a role
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+
+  function validateEmail(val) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  }
 
   async function handleLogin(e) {
     e.preventDefault();
     setError("");
+    setSuccess("");
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!role || !["creator", "investor", "admin"].includes(role)) {
+      setError("Please select a valid role.");
+      return;
+    }
+    setLoading(true);
     try {
-      // Accept email OR username for identifier
-      let payload = identifier.includes("@")
-        ? { email: identifier, password }
-        : { username: identifier, password };
-      // Optionally send role if supplied
-      if (role) payload.role = role;
+      const payload = { email, role };
       const result = await apiPost("/auth/login", payload, null, false);
-      if (result && result.access_token) {
+      if (result && (result.access_token || result.token)) {
         setUser({
-          token: result.access_token,
-          username: result.username,
-          role: result.role,
-          email: result.email,
+          token: result.access_token || result.token,
+          email: result.email || email,
+          role: result.role || role,
         });
-        // Redirect to dashboard/landing based on role
-        if (result.role === "creator")
-          navigate("/creator/dashboard");
-        else if (result.role === "investor")
-          navigate("/investor/dashboard");
-        else
-          navigate("/");
+        setSuccess("Login successful! Redirecting...");
+        setTimeout(() => {
+          if (role === "creator") navigate("/creator/dashboard");
+          else if (role === "investor") navigate("/investor/dashboard");
+          else if (role === "admin") navigate("/admin");
+          else navigate("/");
+        }, 800);
       } else {
-        setError("Invalid response");
+        setError(
+          (result && result.detail) ||
+            "Login failed. Please try again or contact support."
+        );
       }
     } catch (e) {
-      setError("Login failed: " + (e.message || e));
+      let message = "Login error: ";
+      try {
+        const errObj = JSON.parse(e.message);
+        message += errObj.detail || e.message;
+      } catch {
+        message += e.message;
+      }
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -85,64 +110,66 @@ export default function LoginPage() {
               {error}
             </motion.div>
           )}
+          {success && (
+            <motion.div
+              className="mb-2 text-sm text-neon-mint px-3 py-1 rounded bg-glass-white/30"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {success}
+            </motion.div>
+          )}
           <div className="flex flex-col gap-2">
-            <label htmlFor="login-identifier" className="font-heading text-sm font-semibold text-gold/90">
-              Email or Username
+            <label htmlFor="login-email" className="font-heading text-sm font-semibold text-gold/90">
+              Email
             </label>
             <input
-              id="login-identifier"
-              type="text"
-              value={identifier}
-              onChange={e => setIdentifier(e.target.value)}
-              autoFocus
+              id="login-email"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               required
+              autoFocus
               className="transition border border-gold/30 rounded-lg px-4 py-2 bg-background/70 text-white focus:outline-none focus:border-neon-mint/80 font-body"
-              placeholder="Enter email or username"
+              placeholder="Enter your email"
             />
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="login-role" className="font-heading text-sm font-semibold text-gold/90">
-              Role <span className="text-xs text-gold/60">(optional)</span>
+              Role
             </label>
             <select
               id="login-role"
               value={role}
               onChange={e => setRole(e.target.value)}
+              required
               className="transition border border-gold/30 rounded-lg px-4 py-2 bg-background/60 text-white"
             >
-              <option value="">(Any)</option>
+              <option value="">(Select role)</option>
               <option value="creator">Creator</option>
               <option value="investor">Investor</option>
               <option value="admin">Admin</option>
             </select>
           </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="login-password" className="font-heading text-sm font-semibold text-gold/90">
-              Password
-            </label>
-            <input
-              id="login-password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              className="transition border border-gold/30 rounded-lg px-4 py-2 bg-background/70 text-white focus:outline-none focus:border-neon-mint/80 font-body"
-            />
-          </div>
           <motion.button
             type="submit"
-            className="mt-6 w-full py-3 rounded-xl font-heading font-bold text-lg bg-gradient-to-r from-neon-mint via-white/20 to-gold shadow-neon border-0 outline-none relative text-background
+            disabled={loading}
+            className={`mt-6 w-full py-3 rounded-xl font-heading font-bold text-lg bg-gradient-to-r from-neon-mint via-white/20 to-gold shadow-neon border-0 outline-none relative text-background
               before:absolute before:-inset-1 before:blur before:bg-gradient-to-r before:from-neon-mint before:via-gold/60 before:to-neon-mint/60
-              hover:scale-105 hover:shadow-goldish transition-transform"
+              hover:scale-105 hover:shadow-goldish transition-transform
+              ${loading ? "opacity-70 cursor-not-allowed" : ""}`
+            }
             initial={{ boxShadow: "0px 0px 0px #00FFC2" }}
-            animate={{ boxShadow: ["0 0 0px #00FFC2", "0 0 16px #00FFC2, 0 0 2px #FFD700"] }}
+            animate={{
+              boxShadow: ["0 0 0px #00FFC2", "0 0 16px #00FFC2, 0 0 2px #FFD700"],
+            }}
             transition={{
               repeat: Infinity,
               repeatType: "mirror",
               duration: 2,
             }}
           >
-            <span className="relative z-10">Sign In</span>
+            <span className="relative z-10">{loading ? "Signing in..." : "Sign In"}</span>
           </motion.button>
         </form>
         <div className="mt-5 text-gray-400 text-xs flex items-center justify-center gap-1">
