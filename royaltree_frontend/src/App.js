@@ -6,7 +6,7 @@ import AOS from "aos";
 import { motion, AnimatePresence } from "framer-motion";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+
 import CreatorDashboard from "./pages/CreatorDashboard";
 import InvestorDashboard from "./pages/InvestorDashboard";
 import AssetDetailPage from "./pages/AssetDetailPage";
@@ -65,11 +65,7 @@ function App() {
                     <LoginPage />
                   </MotionSection>
                 } />
-                <Route path="/register" element={
-                  <MotionSection key="register">
-                    <RegisterPage />
-                  </MotionSection>
-                } />
+
                 <Route path="/health" element={
                   <MotionSection key="healthcheck">
                     <HealthCheckPage />
@@ -214,12 +210,6 @@ function HeaderNav({ user, logout, theme, toggleTheme }) {
               className="px-2 py-1 rounded font-heading transition hover:text-neon-mint"
             >
               Login
-            </Link>
-            <Link
-              to="/register"
-              className="px-2 py-1 rounded font-heading transition hover:text-neon-mint"
-            >
-              Register
             </Link>
           </>
         )}
