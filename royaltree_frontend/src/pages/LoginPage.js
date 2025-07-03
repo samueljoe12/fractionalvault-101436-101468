@@ -6,22 +6,24 @@ import { motion } from "framer-motion";
 
 // PUBLIC_INTERFACE
 /**
- * Login page for Royaltree: users login with email and role.
- * Provides modern UI, frontend validation, direct backend connection, session update & robust error/success feedback.
+ * Login page for Royaltree platform.
+ * Clean form with email and role selection, robust validation, backend integration, and clear session/error feedback.
  */
 export default function LoginPage() {
   const { setUser } = useContext(UserContext);
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState(""); // User must select a role
+  const [role, setRole] = useState(""); // must be explicitly selected
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
+  // PUBLIC_INTERFACE
   function validateEmail(val) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
   }
 
+  // PUBLIC_INTERFACE
   async function handleLogin(e) {
     e.preventDefault();
     setError("");
@@ -30,7 +32,7 @@ export default function LoginPage() {
       setError("Please enter a valid email address.");
       return;
     }
-    if (!role || !["creator", "investor", "admin"].includes(role)) {
+    if (!["creator", "investor", "admin"].includes(role)) {
       setError("Please select a valid role.");
       return;
     }
@@ -50,7 +52,7 @@ export default function LoginPage() {
           else if (role === "investor") navigate("/investor/dashboard");
           else if (role === "admin") navigate("/admin");
           else navigate("/");
-        }, 800);
+        }, 900);
       } else {
         setError(
           (result && result.detail) ||
@@ -72,12 +74,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full h-full flex items-center justify-center min-h-[70vh]">
+    <div className="w-full h-full flex items-center justify-center min-h-[72vh]">
       <motion.div
-        className="relative bg-glass-black/70 backdrop-blur-xl p-8 sm:p-12 rounded-3xl shadow-glass border border-gold/30 max-w-md w-full"
-        initial={{ opacity: 0, y: 40, scale: 0.94 }}
+        className="relative bg-glass-black/80 backdrop-blur-xl p-8 sm:p-12 rounded-3xl shadow-glass border border-gold/30 max-w-md w-full"
+        initial={{ opacity: 0, y: 38, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.9, type: "spring" }}
+        transition={{ duration: 0.8, type: "spring" }}
       >
         <div className="absolute -top-10 left-8 flex items-center gap-2">
           <svg
@@ -119,6 +121,7 @@ export default function LoginPage() {
               {success}
             </motion.div>
           )}
+          {/* Email field */}
           <div className="flex flex-col gap-2">
             <label htmlFor="login-email" className="font-heading text-sm font-semibold text-gold/90">
               Email
@@ -134,6 +137,7 @@ export default function LoginPage() {
               placeholder="Enter your email"
             />
           </div>
+          {/* Role field */}
           <div className="flex flex-col gap-2">
             <label htmlFor="login-role" className="font-heading text-sm font-semibold text-gold/90">
               Role
@@ -143,7 +147,7 @@ export default function LoginPage() {
               value={role}
               onChange={e => setRole(e.target.value)}
               required
-              className="transition border border-gold/30 rounded-lg px-4 py-2 bg-background/60 text-white"
+              className="transition border border-gold/30 rounded-lg px-4 py-2 bg-background/70 text-white focus:outline-none focus:border-neon-mint/80 font-body"
             >
               <option value="">(Select role)</option>
               <option value="creator">Creator</option>

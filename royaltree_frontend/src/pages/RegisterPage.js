@@ -6,23 +6,25 @@ import { motion } from "framer-motion";
 
 // PUBLIC_INTERFACE
 /**
- * Clean registration page for Royaltree: users register with email and role.
- * Provides modern UI, frontend validation, robust backend connection, session update & clear feedback.
+ * Registration page for Royaltree platform.
+ * Clean form with email and role selection, robust validation, backend integration, and clear state feedback.
  */
 export default function RegisterPage() {
   const { setUser } = useContext(UserContext);
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("creator");
+  const [role, setRole] = useState(""); // role must be explicitly selected
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
-  // Email regex (basic validation)
+  // PUBLIC_INTERFACE
   function validateEmail(val) {
+    // Minimal valid email check
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
   }
 
+  // PUBLIC_INTERFACE
   async function handleRegister(e) {
     e.preventDefault();
     setError("");
@@ -31,17 +33,16 @@ export default function RegisterPage() {
       setError("Please enter a valid email address.");
       return;
     }
-    if (role !== "creator" && role !== "investor") {
-      setError("Role must be Creator or Investor.");
+    if (!["creator", "investor"].includes(role)) {
+      setError("Please select a valid role.");
       return;
     }
     setLoading(true);
     try {
-      // Only pass email and role (as per backend contract)
+      // Only pass email and role (per backend docs)
       const payload = { email, role };
       const result = await apiPost("/auth/register", payload, null, false);
       if (result && (result.access_token || result.token)) {
-        // Session: update user context
         setUser({ email, role, token: result.access_token || result.token });
         setSuccess("Registration successful! Redirecting...");
         setTimeout(() => {
@@ -56,8 +57,7 @@ export default function RegisterPage() {
         );
       }
     } catch (e) {
-      let message = "Error: ";
-      // Try to parse backend error response details
+      let message = "Registration error: ";
       try {
         const errObj = JSON.parse(e.message);
         message += errObj.detail || e.message;
@@ -71,12 +71,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="w-full h-full flex items-center justify-center min-h-[70vh]">
+    <div className="w-full h-full flex items-center justify-center min-h-[72vh]">
       <motion.div
-        className="relative bg-glass-black/70 backdrop-blur-2xl p-8 sm:p-12 rounded-3xl shadow-glass border border-gold/30 max-w-md w-full"
-        initial={{ opacity: 0, y: 44, scale: 0.94 }}
+        className="relative bg-glass-black/80 backdrop-blur-xl p-8 sm:p-12 rounded-3xl shadow-glass border border-gold/30 max-w-md w-full"
+        initial={{ opacity: 0, y: 42, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 1.0, type: "spring" }}
+        transition={{ duration: 0.8, type: "spring" }}
       >
         <div className="absolute -top-10 left-8 flex items-center gap-2">
           <svg
@@ -86,7 +86,7 @@ export default function RegisterPage() {
             strokeWidth={1.5}
             viewBox="0 0 24 24"
           >
-            <ellipse cx="12" cy="12" rx="9" ry="10" className="stroke-gold/90" fill="gold" fillOpacity={0.30}/>
+            <ellipse cx="12" cy="12" rx="9" ry="10" className="stroke-gold/90" fill="gold" fillOpacity={0.32}/>
             <path
               d="M12 6v6l4 2"
               strokeLinejoin="round"
@@ -99,7 +99,11 @@ export default function RegisterPage() {
             Register
           </h1>
         </div>
-        <form className="pt-10 flex flex-col gap-6" onSubmit={handleRegister} autoComplete="on">
+        <form
+          className="pt-10 flex flex-col gap-6"
+          onSubmit={handleRegister}
+          autoComplete="on"
+        >
           {error && (
             <motion.div
               className="mb-2 text-sm text-red-400 px-3 py-1 rounded bg-glass-white/30"
@@ -118,6 +122,7 @@ export default function RegisterPage() {
               {success}
             </motion.div>
           )}
+          {/* Email field */}
           <div className="flex flex-col gap-2">
             <label htmlFor="reg-email" className="font-heading text-sm font-semibold text-gold/90">
               Email Address
@@ -133,6 +138,7 @@ export default function RegisterPage() {
               placeholder="you@example.com"
             />
           </div>
+          {/* Role field */}
           <div className="flex flex-col gap-2">
             <label htmlFor="reg-role" className="font-heading text-sm font-semibold text-gold/90">
               Role
@@ -141,9 +147,10 @@ export default function RegisterPage() {
               id="reg-role"
               value={role}
               onChange={e => setRole(e.target.value)}
-              className="transition border border-gold/30 rounded-lg px-4 py-2 bg-background/70 text-white focus:outline-none focus:border-neon-mint/80 font-body"
               required
+              className="transition border border-gold/30 rounded-lg px-4 py-2 bg-background/70 text-white focus:outline-none focus:border-neon-mint/80 font-body"
             >
+              <option value="">(Select role)</option>
               <option value="creator">Creator</option>
               <option value="investor">Investor</option>
             </select>
@@ -166,7 +173,7 @@ export default function RegisterPage() {
             transition={{
               repeat: Infinity,
               repeatType: "mirror",
-              duration: 2.2,
+              duration: 2.1,
             }}
           >
             <span className="relative z-10">{loading ? "Registering..." : "Create Account"}</span>
