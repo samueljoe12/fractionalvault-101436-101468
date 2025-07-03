@@ -1,7 +1,13 @@
 //
 // Royaltree frontend API helpers for REST endpoints
 //
-const API_BASE = ""; // Set to your API host root or leave '' for same-origin proxy
+// Allow API base URL to be set via environment variable or default to local dev server, for deployment flexibility
+const API_BASE = (
+  process.env.REACT_APP_BACKEND_BASE_URL ||
+  process.env.BACKEND_BASE_URL ||
+  (window && window._API_BASE_URL) ||
+  "http://localhost:3001"
+);
 
 // PUBLIC_INTERFACE
 export async function apiGet(path, params = {}, token = null) {

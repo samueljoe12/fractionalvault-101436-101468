@@ -11,6 +11,19 @@ This project provides a minimal React template with a clean, modern UI and minim
 
 ## Getting Started
 
+### Configuration
+
+> **IMPORTANT**: Set your backend API endpoint!
+>
+> Add a `.env` file at the project root with:
+>
+> ```
+> REACT_APP_BACKEND_BASE_URL=http://localhost:3001
+> ```
+> Adjust the host as needed for deployment. This makes frontend API calls target your backend.
+>
+> If you see CORS errors, ensure your backend's CORS settings allow requests from your frontend origin (e.g., http://localhost:3000).
+
 In the project directory, you can run:
 
 ### `npm start`
