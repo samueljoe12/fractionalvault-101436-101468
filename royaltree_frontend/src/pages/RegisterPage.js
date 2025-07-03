@@ -18,11 +18,11 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
     try {
-      // Registration expects application/json (not FormData)
-      // Use isForm=false in apiPost to send JSON for backend FastAPI compatibility
-      const result = await apiPost("/auth/register", { username, email, role, password }, null, false);
+      // Registration expects application/json (not FormData).
+      // Send as direct JSON (no user_json wrapper, no nested stringification).
+      const payload = { username, email, role, password };
+      const result = await apiPost("/auth/register", payload, null, false);
       if (result && (result.id || result.access_token)) {
-        // If backend responds with an access token immediately, set it in context
         setUser(result.access_token ? { username, role, token: result.access_token } : { username, role });
         navigate("/");
       } else {

@@ -16,7 +16,9 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     try {
-      const result = await apiPost("/auth/login", { username, password }, null, true);
+      // Send credentials as direct JSON (not wrapped, no stringification, matches FastAPI backend).
+      const payload = { username, password };
+      const result = await apiPost("/auth/login", payload, null, false);
       if (result && result.access_token) {
         setUser({ token: result.access_token });
         navigate("/");
