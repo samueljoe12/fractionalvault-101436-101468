@@ -16,6 +16,7 @@ import TransactionsPage from "./pages/TransactionsPage";
 import AdminPanelPage from "./pages/AdminPanelPage";
 import HealthCheckPage from "./pages/HealthCheckPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ApiDebugPage from "./pages/ApiDebugPage";
 
 // Simple context for user/session info
 export const UserContext = React.createContext(null);
@@ -122,6 +123,7 @@ function App() {
                   </RequireAuth>
                 } />
                 <Route path="*" element={<NotFoundPage />} />
+                <Route path="/api-debug" element={<MotionSection key="api-debug"><ApiDebugPage /></MotionSection>} />
               </Routes>
             </AnimatePresence>
           </main>
