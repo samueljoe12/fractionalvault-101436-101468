@@ -20,6 +20,14 @@ This project provides a minimal React template with a clean, modern UI and minim
 > ```
 > REACT_APP_BACKEND_BASE_URL=https://vscode-internal-8323-beta.beta01.cloud.kavia.ai:3001
 > ```
+> 
+> - Ensure your backend is running and accessible at this endpoint (use `curl -v https://vscode-internal-8323-beta.beta01.cloud.kavia.ai:3001/health/db` from host AND from inside any development container if available).
+> - If using HTTPS for frontend (cloud preview URL), back end MUST also be served over HTTPS—**no HTTP allowed for API** when frontend is HTTPS (browser blocks "mixed content").
+> - For proxy diagnosis: Attempt `curl -v https://vscode-internal-8323-beta.beta01.cloud.kavia.ai:3001/auth/register` as a POST with an appropriate payload using Content-Type: application/json to confirm registration endpoint works (or /docs responds).
+> - If you get "Failed to fetch" with no status code: check browser console for CORS preflight, mixed content, network, or proxy errors.
+> - If using NGINX, ensure `proxy_pass` is forwarding HTTPS from port 3001 **to** the backend Uvicorn server at the expected port and on HTTPS if needed.
+> - If backend is listening on plain HTTP but accessed via HTTPS proxy, proxy must handle SSL/TLS and securely forward.
+> - All firewall/security group rules MUST allow traffic between nginx/proxy container and backend app (port 8000).
 > (If running on a cloud/dev platform, you must use the *external* or preview URL exactly as shown above - never "localhost" or "127.0.0.1" for production/previews!)
 >
 > **Troubleshooting "Failed to fetch":**
@@ -128,3 +136,16 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 8. **Summarize findings for all steps above.**
 
 > Remove this section when the fetch/CORS error is resolved.
+
+---
+## Additional Diagnostics
+
+A detailed step-by-step diagnostics checklist is provided in `NETWORK_DIAGNOSTICS.md` in this folder.  
+Follow it _fully_ to pinpoint issues with API connectivity, mixed-content protocol, NGINX/proxy routes, and CORS.  
+Most connectivity problems trace to:  
+- Browser blocks (mixed HTTPS/HTTP)
+- Proxy/NGINX forwarding to wrong backend protocol/port
+- CORS settings not matching
+- Backend not running or not exposed
+
+Make sure both frontend and backend use HTTPS and the correct URLs, and run the provided curl commands inside both host and frontend (if containerized).
