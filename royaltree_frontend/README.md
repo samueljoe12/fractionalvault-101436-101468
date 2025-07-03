@@ -16,19 +16,21 @@ This project provides a minimal React template with a clean, modern UI and minim
 > **IMPORTANT**: Set your backend API endpoint!
 >
 > Add a `.env` file at the project root with:
->
+> 
 > ```
-> REACT_APP_BACKEND_BASE_URL=http://localhost:3001
+> REACT_APP_BACKEND_BASE_URL=https://vscode-internal-8323-beta.beta01.cloud.kavia.ai:3001
 > ```
-> Adjust the host, protocol (http or https!), and port if running in a non-localhost environment.
+> (If running on a cloud/dev platform, you must use the *external* or preview URL exactly as shown above - never "localhost" or "127.0.0.1" for production/previews!)
 >
 > **Troubleshooting "Failed to fetch":**
 >
-> 1. The API URL (including protocol, host, AND port) MUST match your backend server location and be reachable from your browser. If running locally, both frontend and backend must use compatible hosts (localhost or 127.0.0.1).
-> 2. If deployed (cloud/devbox), use the *external* or proxy URL provided by your platform. Do **not** use "localhost" in `.env` for cloud previews!
-> 3. You may override by setting `window._API_BASE_URL` in `public/index.html` (insert `<script>window._API_BASE_URL = "..."></script>`).
-> 4. Check backend is running and listening on the expected URL and port.
-> 5. If you see CORS errors, ensure your backend's CORS settings allow requests from your frontend origin (e.g., http://localhost:3000).
+> 1. API URL must match backend's *external* protocol/host/port as seen by the browser. In the VSCode cloud preview use the provided external endpoint above!
+> 2. If using HTTPS backend, always use HTTPS for the frontend and API base.
+> 3. Check that both frontend and backend are deployed and accessible from your browser's network (review CORS console/network errors for precise cause).
+> 4. When using "credentials: 'include'" in fetch, backend CORS must exactly match the frontend origin.
+> 5. If you encounter "Failed to fetch," open browser devtools > Network tab, click the failed request, and inspect the *full* error including headers and status.
+> 6. If encountering "blocked by CORS" or "Mixed Content," fix the protocol/host or backend CORS settings.
+> 7. For advanced debugging: Run `curl` from within the frontend container/environment to the backend URL to confirm direct connectivity.
 >
 > This config makes frontend API calls target your backend.
 
@@ -105,18 +107,24 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 ---
 
-# Diagnostic Results for 'Failed to fetch' (Network/API Error)
+# Diagnostic Steps for Debugging "Failed to fetch" (Network/API Error)
 
-> This section is temporarily used to record diagnostic output for debugging API connectivity between frontend and backend as part of the troubleshooting effort.
+**When troubleshooting frontend/backend connectivity, follow these steps and fill in results:**
 
-## Steps to follow & results will be filled here:
+1. **Verify `.env` contents and the value of `REACT_APP_BACKEND_BASE_URL`.**
+    - This *must* be set to the full external URL (e.g., `https://vscode-internal-8323-beta.beta01.cloud.kavia.ai:3001`)
+2. **Check the browser Network tab and paste the exact error details.**
+    - Include status, headers, and network/console errors (especially for CORS or protocol mismatch).
+3. **Test backend health with curl, both locally and from within the frontend environment:**
+    - Example: `curl -v https://vscode-internal-8323-beta.beta01.cloud.kavia.ai:3001/health/db`
+    - Check for successful response and correct SSL certificate handling.
+4. **Check which protocol is used—for both frontend and backend.**
+    - Never mix HTTPS frontend <-> HTTP backend in production/cloud.
+5. **Are you running with credentials (cookies/session) enabled?**
+    - If so, CORS "Access-Control-Allow-Origin" must *exactly match* the browser's loaded origin.
+6. **Check NGINX/proxy logs (if any) and backend server logs for possible rejections or errors.**
+    - Any 4xx or 5xx logs relevant?
+7. **If using Docker or cloud preview, run an interactive shell and repeat curls for both external and internal targets.**
+8. **Summarize findings for all steps above.**
 
-- [ ] Checked for `.env` file and its REACT_APP_BACKEND_BASE_URL value.
-- [ ] Output of `ls -al` for project root and frontend directory.
-- [ ] Output of `curl` (or similar) to target backend health endpoint.
-- [ ] Captured common ports process listing.
-- [ ] Any error details from browser/dev tools or network logs.
-- [ ] Any next steps and findings will be summarized here.
-
-REMOVE THIS SECTION when diagnostics/bridging is no longer needed.
-
+> Remove this section when the fetch/CORS error is resolved.
