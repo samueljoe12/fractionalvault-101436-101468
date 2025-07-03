@@ -26,7 +26,7 @@ This project provides a minimal React template with a clean, modern UI and minim
 >
 > 1. The API URL (including protocol, host, AND port) MUST match your backend server location and be reachable from your browser. If running locally, both frontend and backend must use compatible hosts (localhost or 127.0.0.1).
 > 2. If deployed (cloud/devbox), use the *external* or proxy URL provided by your platform. Do **not** use "localhost" in `.env` for cloud previews!
-> 3. You may override by setting `window._API_BASE_URL` in `public/index.html` (insert `<script>window._API_BASE_URL = "..."</script>`).
+> 3. You may override by setting `window._API_BASE_URL` in `public/index.html` (insert `<script>window._API_BASE_URL = "..."></script>`).
 > 4. Check backend is running and listening on the expected URL and port.
 > 5. If you see CORS errors, ensure your backend's CORS settings allow requests from your frontend origin (e.g., http://localhost:3000).
 >
@@ -101,3 +101,22 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+---
+
+# Diagnostic Results for 'Failed to fetch' (Network/API Error)
+
+> This section is temporarily used to record diagnostic output for debugging API connectivity between frontend and backend as part of the troubleshooting effort.
+
+## Steps to follow & results will be filled here:
+
+- [ ] Checked for `.env` file and its REACT_APP_BACKEND_BASE_URL value.
+- [ ] Output of `ls -al` for project root and frontend directory.
+- [ ] Output of `curl` (or similar) to target backend health endpoint.
+- [ ] Captured common ports process listing.
+- [ ] Any error details from browser/dev tools or network logs.
+- [ ] Any next steps and findings will be summarized here.
+
+REMOVE THIS SECTION when diagnostics/bridging is no longer needed.
+
